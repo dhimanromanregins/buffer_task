@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Items you added</title>
+  </head>
+  <body>
+  <a href="additem">+ Item</a>
+
+   {% csrf_token %}
+    <h1>List of Items</h1>
+   <ul id="sortable">
+    {% for item in items %}
+      <li id="{{ item.id }}">{{ item.name }}</li>
+    {% endfor %}
+     {% for i in latest_items %}
+       <li id="{{ i.id }}">{{ i.name }}</li>
+       {% endfor %}
+  </ul>
+
+  </body>
+</html>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+
+<script>
+$(function() {
+    var csrftoken = $('[name="csrfmiddlewaretoken"]').val();
+    $("#sortable").sortable({
+        update: function(event, ui) {
+            var order = $(this).sortable("toArray");
+            $.ajax({
+                url: "update_order",
+                type: "POST",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                },
+                data: {
+                    order: order
+                        },
+                success: function(response) {
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+    });
+    $("#sortable").disableSelection();
+});
+</script>
